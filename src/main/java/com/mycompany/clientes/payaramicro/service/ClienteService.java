@@ -22,6 +22,9 @@ import org.hibernate.cfg.Configuration;
  */
 @Stateless
 public class ClienteService {
+    
+    // TODO: consultar os dados de cidade no endereço http://maventest.herokuapp.com/mavenTest-1.0-SNAPSHOT/webresources/cidade
+    // Os endpoints rest podem ser verificados em https://github.com/alerario/mavenTest/blob/master/src/main/java/br/rest/CidadeRest.java
 
     protected final SessionFactory sessionFactory;
     
