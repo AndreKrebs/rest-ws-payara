@@ -8,9 +8,10 @@ package com.mycompany.clientes.payaramicro.service;
 import com.mycompany.clientes.payaramicro.domain.Cliente;
 import com.mycompany.clientes.payaramicro.exception.IdIsNotNullException;
 import java.util.List;
+import java.util.Optional;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -38,16 +39,66 @@ public class ClienteService {
         return clientes;
     }
 
-    public Long cadastrarNovoCliente(Cliente novoCliente) {
-        if (novoCliente.getId() != null) {
+    public Long cadastrarNovoCliente(Cliente cliente) {
+        if (cliente.getId() != null) {
             throw new IdIsNotNullException("Cadastro de Cliente não deve conter ID");
         }
+        
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-        Long id = (Long) session.save(novoCliente);
+        Long id = (Long) session.save(cliente);
         session.getTransaction().commit();
         session.close();
 
         return id;
+    }
+
+    public Cliente atualizaCliente(Cliente cliente) {
+        if (cliente.getId() == null) {
+            throw new BadRequestException("O registro de cliente precisa de um ID");
+        }
+        
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.update(cliente);
+        session.getTransaction().commit();
+        session.close();
+
+        return cliente;
+    }
+
+    public Cliente buscaCliente(Long id) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Optional<Cliente> cliente = session.createQuery("from Cliente where id = :id").setParameter("id", id).uniqueResultOptional();
+        session.getTransaction().commit();
+        session.close();
+
+        if (cliente.isEmpty())
+            throw new NotFoundException("Cliente não encontrado");
+        else
+            return cliente.get();
+    }
+
+    public void deletaCliente(Long id) {
+        if (!this.verificaSeClienteExistePeloId(id)) {
+            throw new BadRequestException("Cliente informado não existe");
+        }
+        
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.createQuery("delete from Cliente where id = :id").setParameter("id", id).executeUpdate();
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    private boolean verificaSeClienteExistePeloId(Long id) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Optional<Cliente> cliente = session.createQuery("from Cliente where id = :id").setParameter("id", id).uniqueResultOptional();
+        session.getTransaction().commit();
+        session.close();
+        
+        return !cliente.isEmpty();
     }
 }

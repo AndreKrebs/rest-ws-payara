@@ -9,9 +9,9 @@ import com.mycompany.clientes.payaramicro.domain.Cliente;
 import com.mycompany.clientes.payaramicro.service.ClienteService;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,40 +36,34 @@ public class ClienteRest {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Long postCadastrarCliente(Cliente novoCliente) {
-        return clienteService.cadastrarNovoCliente(novoCliente);
+    public Long postCadastrarCliente(Cliente cliente) {
+        return clienteService.cadastrarNovoCliente(cliente);
     }
     
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Cliente putAtualizarCliente(Cliente atualizaCliente) {
-        return new Cliente();
+    public Cliente putAtualizarCliente(Cliente cliente) {
+        return clienteService.atualizaCliente(cliente);
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Cliente> getListarClientes() {
-        List<Cliente> clientes = new ArrayList<>();
-        
-        ClienteService clienteService = new ClienteService();
-        
-        clientes = clienteService.listaClientes();
-        
-        return clientes;
+        return clienteService.listaClientes();
     }
     
     @GET
     @Path("/{codigo}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Cliente getBuscarClienteCodigo(@PathParam("codigo") int num1) {
-        return new Cliente();
+    public Cliente getBuscarClienteCodigo(@Valid @PathParam("codigo") Long id) {
+        return clienteService.buscaCliente(id);
     }
     
     @DELETE
     @Path("/{codigo}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void deleteClienteCodigo(@PathParam("codigo") int num1) {
-        
+    public void deleteClienteCodigo(@PathParam("codigo") Long id) {
+        clienteService.deletaCliente(id);
     }
 }
