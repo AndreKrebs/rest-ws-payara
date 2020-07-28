@@ -26,6 +26,13 @@
         <jakartaee>8.0</jakartaee>
     </properties>
     
+    <repositories>
+        <repository>
+            <id>alerario-repo</id>
+            <url>https://raw.githubusercontent.com/alerario/javainterfaces/master/repositorio</url>
+        </repository>
+    </repositories>
+    
     <dependencies>
         <dependency>
             <groupId>javax</groupId>
@@ -65,7 +72,7 @@
             <type>pom</type>
         </dependency>
         
-         <dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.16</version>
@@ -77,6 +84,11 @@
             <version>5.3.7.Final</version>
         </dependency>
         
+        <dependency>
+            <groupId>alerario</groupId>
+            <artifactId>javainterfaces</artifactId>
+            <version>1.0</version>       
+        </dependency>
     </dependencies>
 
     <build>

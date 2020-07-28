@@ -6,10 +6,14 @@
 package com.mycompany.clientes.payaramicro.service;
 
 import com.mycompany.clientes.payaramicro.domain.Cliente;
+import com.mycompany.clientes.payaramicro.domain.dto.ClienteCidadeDTO;
 import com.mycompany.clientes.payaramicro.exception.IdIsNotNullException;
+import com.mycompany.clientes.payaramicro.thirdPartyAPIs.CidadeAPI;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import org.hibernate.Session;
@@ -22,24 +26,28 @@ import org.hibernate.cfg.Configuration;
  */
 @Stateless
 public class ClienteService {
-    
-    // TODO: consultar os dados de cidade no endereço http://maventest.herokuapp.com/mavenTest-1.0-SNAPSHOT/webresources/cidade
-    // Os endpoints rest podem ser verificados em https://github.com/alerario/mavenTest/blob/master/src/main/java/br/rest/CidadeRest.java
 
+    @Inject
+    private CidadeAPI cidadeAPI;
+    
     protected final SessionFactory sessionFactory;
     
     public ClienteService() {
         this.sessionFactory = new Configuration().configure().buildSessionFactory();
     }
 
-    public List<Cliente> listaClientes() {
+    public List<ClienteCidadeDTO> listarClientes() {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         List<Cliente> clientes = session.createQuery("from Cliente order by nome asc").list();
         session.getTransaction().commit();
         session.close();
-
-        return clientes;
+        
+        return clientes.stream()
+            .map(cliente -> converteClienteEmClienteCidadeDto(
+                    cliente, 
+                    cliente.getCidadeId().intValue()))
+            .collect(Collectors.toList());
     }
 
     public Long cadastrarNovoCliente(Cliente cliente) {
@@ -56,7 +64,7 @@ public class ClienteService {
         return id;
     }
 
-    public Cliente atualizaCliente(Cliente cliente) {
+    public ClienteCidadeDTO atualizarCliente(Cliente cliente) {
         if (cliente.getId() == null) {
             throw new BadRequestException("O registro de cliente precisa de um ID");
         }
@@ -66,24 +74,36 @@ public class ClienteService {
         session.update(cliente);
         session.getTransaction().commit();
         session.close();
+        
+        ClienteCidadeDTO clienteCidade = converteClienteEmClienteCidadeDto(
+                cliente, 
+                cliente.getCidadeId().intValue()
+            );
 
-        return cliente;
+        return clienteCidade;
+    }
+    
+    private ClienteCidadeDTO converteClienteEmClienteCidadeDto(Cliente cliente, int cidadeId) {
+        return new ClienteCidadeDTO(
+                cliente, 
+                cidadeAPI.buscarCidadeId(cidadeId)
+            );
     }
 
-    public Cliente buscaCliente(Long id) {
+    public Cliente buscarCliente(Long id) {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         Optional<Cliente> cliente = session.createQuery("from Cliente where id = :id").setParameter("id", id).uniqueResultOptional();
         session.getTransaction().commit();
         session.close();
 
-        if (cliente.isEmpty())
+        if (!cliente.isPresent())
             throw new NotFoundException("Cliente não encontrado");
         else
             return cliente.get();
     }
 
-    public void deletaCliente(Long id) {
+    public void deletarCliente(Long id) {
         if (!this.verificaSeClienteExistePeloId(id)) {
             throw new BadRequestException("Cliente informado não existe");
         }
@@ -102,6 +122,6 @@ public class ClienteService {
         session.getTransaction().commit();
         session.close();
         
-        return !cliente.isEmpty();
+        return cliente.isPresent();
     }
 }

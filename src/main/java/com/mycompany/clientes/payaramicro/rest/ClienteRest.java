@@ -6,6 +6,7 @@
 package com.mycompany.clientes.payaramicro.rest;
 
 import com.mycompany.clientes.payaramicro.domain.Cliente;
+import com.mycompany.clientes.payaramicro.domain.dto.ClienteCidadeDTO;
 import com.mycompany.clientes.payaramicro.service.ClienteService;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,27 +44,27 @@ public class ClienteRest {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Cliente putAtualizarCliente(Cliente cliente) {
-        return clienteService.atualizaCliente(cliente);
+    public ClienteCidadeDTO putAtualizarCliente(Cliente cliente) {
+        return clienteService.atualizarCliente(cliente);
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Cliente> getListarClientes() {
-        return clienteService.listaClientes();
+    public List<ClienteCidadeDTO> getListarClientes() {
+        return clienteService.listarClientes();
     }
     
     @GET
     @Path("/{codigo}")
     @Produces(MediaType.APPLICATION_JSON)
     public Cliente getBuscarClienteCodigo(@Valid @PathParam("codigo") Long id) {
-        return clienteService.buscaCliente(id);
+        return clienteService.buscarCliente(id);
     }
     
     @DELETE
     @Path("/{codigo}")
     @Produces(MediaType.APPLICATION_JSON)
     public void deleteClienteCodigo(@PathParam("codigo") Long id) {
-        clienteService.deletaCliente(id);
+        clienteService.deletarCliente(id);
     }
 }
