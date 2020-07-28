@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core" >
+    <h:head>
+        <title>Clientes</title>
+    </h:head>
+    <h:body>
+        <h2>Cadastro de clientes</h2>
+        <h:form>
+            <label>Nome:</label><br/>
+            <h:inputText value="#{jsfCliente.nome}"/> <br/><br/>
+            <label>Cidade:</label><br/>
+            <h:selectOneListbox value="#{jsfCliente.cidadeId}">
+                <f:selectItems value="#{jsfCliente.cidades}" var="c"
+                               itemLabel="#{c.nome}" itemValue="#{c.codigo}" />
+            </h:selectOneListbox> <br/>
+            <h:commandButton action="#{jsfCliente.addCliente()}" value="ADD"/>
+        </h:form>
+        
+        <hr/>
+        <h2>Lista de clientes</h2>
+        <h:dataTable value="#{jsfCliente.listarTodos()}" var="cli">
+            <h:column>
+                <f:facet name="header">ID cliente</f:facet> 
+                <h:outputText value="#{cli.id}" />
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Nome cliente</f:facet> 
+                <h:outputText value="#{cli.nome}" />
+            </h:column>
+            
+            <h:column>
+                <f:facet name="header">ID cidade</f:facet> 
+                <h:outputText value="#{cli.cidade.codigo}" />
+            </h:column>
+            
+            <h:column>
+                <f:facet name="header">Nome cidade</f:facet> 
+                <h:outputText value="#{cli.cidade.nome}" />
+            </h:column>
+        </h:dataTable>
+    
+        
+      
+    </h:body>
+</html>
